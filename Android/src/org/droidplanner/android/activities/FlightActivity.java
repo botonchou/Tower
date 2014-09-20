@@ -1,6 +1,7 @@
 package org.droidplanner.android.activities;
 
 import org.droidplanner.R;
+import org.droidplanner.android.communication.connection.AndroidHttpConnection;
 import org.droidplanner.android.dialogs.DroneshareDialog;
 import org.droidplanner.android.fragments.FlightActionsFragment;
 import org.droidplanner.android.fragments.FlightMapFragment;
@@ -167,6 +168,9 @@ public class FlightActivity extends DrawerNavigationUI implements
 		}
 
 		DroneshareDialog.perhapsShow(this);
+		
+		// TODO
+		AndroidHttpConnection.get("http://stackoverflow.com");
 	}
 
 	private void updateMapLocationButtons(AutoPanMode mode) {

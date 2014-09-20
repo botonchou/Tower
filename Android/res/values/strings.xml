@@ -471,5 +471,6 @@
 
     <!-- Help -->
     <string name="help_item_description">How to plan and fly a mission</string>
+    <string name="force_arm">Arm</string>
 
 </resources>

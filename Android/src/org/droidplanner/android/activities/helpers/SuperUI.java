@@ -23,6 +23,7 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import org.droidplanner.core.MAVLink.MavLinkArm;
 /**
  * Parent class for the app activity classes.
  */
@@ -191,6 +192,11 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 
 		case R.id.menu_load_mission:
 			drone.getWaypointManager().getWaypoints();
+			return true;
+			
+		case R.id.menu_force_arm:
+			// TODO
+			MavLinkArm.sendArmMessage(drone, true);
 			return true;
 
 		case android.R.id.home:
