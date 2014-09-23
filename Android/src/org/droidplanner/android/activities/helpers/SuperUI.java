@@ -2,6 +2,8 @@ package org.droidplanner.android.activities.helpers;
 
 import org.droidplanner.R;
 import org.droidplanner.android.DroidPlannerApp;
+import org.droidplanner.android.communication.connection.AndroidHttpConnection;
+import org.droidplanner.android.communication.connection.AndroidHttpConnection.Callback;
 import org.droidplanner.android.fragments.helpers.BTDeviceListFragment;
 import org.droidplanner.android.maps.providers.google_map.GoogleMapFragment;
 import org.droidplanner.android.utils.Utils;
@@ -20,6 +22,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.NavUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -31,6 +34,8 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 
 	public final static String ACTION_TOGGLE_DRONE_CONNECTION = SuperUI.class.getName()
 			+ ".ACTION_TOGGLE_DRONE_CONNECTION";
+	
+	private static final String MY_SERVER_IP = "http://140.112.21.18:8080";
 
 	private ScreenOrientation screenOrientation = new ScreenOrientation(this);
 	private InfoBarActionProvider infoBar;
@@ -91,7 +96,28 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 			toggleDroneConnection();
 		}
 	}
+	
+	private class CallbackImpl implements Callback {
 
+		private Drone drone;
+		
+		public CallbackImpl(Drone drone) {
+			this.drone = drone;
+		}
+
+		@Override
+		public void execute(String data) {			
+			if (data.equals("ARM")) {
+				Log.d("debug", "Receive message to arm. Start arming...");
+				MavLinkArm.sendArmMessage(drone, true);
+			} else if (data.equals("DISARM")) {
+				Log.d("debug", "Receive message to disarm. Start disarming...");
+				MavLinkArm.sendArmMessage(drone, false);
+			}
+				
+		}
+	}
+	
 	@Override
 	protected void onStart() {
 		super.onStart();
@@ -99,6 +125,8 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 		drone.addDroneListener(this);
 		drone.getMavClient().queryConnectionState();
 		drone.notifyDroneEvent(DroneEventsType.MISSION_UPDATE);
+		
+		AndroidHttpConnection conn = new AndroidHttpConnection("http://140.112.21.18:8080", new CallbackImpl(drone));
 	}
 
 	private void maxVolumeIfEnabled() {
@@ -108,7 +136,7 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 					audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC), 0);
 		}
 	}
-
+	
 	@Override
 	protected void onStop() {
 		super.onStop();

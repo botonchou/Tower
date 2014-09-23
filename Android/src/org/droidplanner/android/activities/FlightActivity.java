@@ -168,9 +168,6 @@ public class FlightActivity extends DrawerNavigationUI implements
 		}
 
 		DroneshareDialog.perhapsShow(this);
-		
-		// TODO
-		AndroidHttpConnection.get("http://stackoverflow.com");
 	}
 
 	private void updateMapLocationButtons(AutoPanMode mode) {
