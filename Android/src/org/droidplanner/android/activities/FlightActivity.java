@@ -1,7 +1,6 @@
 package org.droidplanner.android.activities;
 
 import org.droidplanner.R;
-import org.droidplanner.android.communication.connection.AndroidHttpConnection;
 import org.droidplanner.android.dialogs.DroneshareDialog;
 import org.droidplanner.android.fragments.FlightActionsFragment;
 import org.droidplanner.android.fragments.FlightMapFragment;

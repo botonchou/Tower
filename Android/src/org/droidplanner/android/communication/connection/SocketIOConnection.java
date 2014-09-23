@@ -7,10 +7,11 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.util.Log;
 
-public class AndroidHttpConnection {
+public class SocketIOConnection {
 
 	// TODO
 	public interface Callback {
@@ -20,12 +21,55 @@ public class AndroidHttpConnection {
 	private String url;
 	private Socket socket;
 	private Callback callback;
+	final public static String server_ip = "http://140.112.21.18:8080";
+	static private SocketIOConnection socket_conn = new SocketIOConnection(server_ip);
 	
-	public AndroidHttpConnection (String url, Callback callback) {
+	static public SocketIOConnection getInstance() {
+		return socket_conn;
+	}
+	
+	private SocketIOConnection (String url) {
 		this.url = url;
-		this.callback = callback;
+		this.callback = new Callback() {
+			@Override
+			public void execute(String data) {
+				// do nothing.
+			}
+		};
+			
 		new RequestTask().execute(this.url);
-	}	
+	}
+	
+	public void setCallback(Callback callback) {
+		this.callback = callback;
+	}
+	
+	@SuppressLint("DefaultLocale")
+	public void send_msg(final Object... msgs) {
+		String timestamp = String.format("%d", new Date().getTime());
+		
+		// args = [timestamp, msgs, md5]
+		Object[] args = new Object[msgs.length + 2];
+		args[0] = (Object) timestamp;		
+		System.arraycopy(msgs, 0, args, 1, msgs.length);
+		
+		String check_str = "";
+		for (int i=0; i<args.length - 1; ++i)
+			check_str += args[i].toString();
+		args[args.length - 1] = (Object) MD5(check_str);
+		
+		// TODO
+		socket.emit("message", args);
+	}
+	
+	public void send(final Object... msg) {
+		send_msg(msg);
+	}
+	
+	public void send(Callback callback, final Object... msg) {
+		// TODO push callback into callback_queue
+		send_msg(msg);
+	}
 	
 	class RequestTask extends AsyncTask<String, String, String>{
 
@@ -47,7 +91,7 @@ public class AndroidHttpConnection {
 	    	  @Override
 	    	  public void call(Object... args) {
 	    		Log.d("debug", "[INFO] Connected to server");
-	    		send("Hi~~ I'm an Android phone !!");
+	    		send_msg("Hi~~ I'm an Android phone !!");
 	    	  }
 	    	  
 	    	}).on("message", new Emitter.Listener() {
@@ -71,7 +115,7 @@ public class AndroidHttpConnection {
 	    		  // Find a way to hold the reference of droid, either using callback or through constructor
 	    		  callback.execute(msg);
 	    		  
-	    		  send("ack from Android");
+	    		  send_msg("ack from Android");
 	    	  }
 
 	    	}).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
@@ -108,10 +152,5 @@ public class AndroidHttpConnection {
 		} catch (java.security.NoSuchAlgorithmException e) {
 		}
 		return null;
-	}
-	
-	public void send(String msg) {
-		String timestamp = String.format("%d", new Date().getTime());
-		socket.emit("message", timestamp, msg, MD5(timestamp + msg));
 	}
 }

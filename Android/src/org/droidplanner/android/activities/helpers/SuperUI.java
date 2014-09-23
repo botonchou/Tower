@@ -2,8 +2,8 @@ package org.droidplanner.android.activities.helpers;
 
 import org.droidplanner.R;
 import org.droidplanner.android.DroidPlannerApp;
-import org.droidplanner.android.communication.connection.AndroidHttpConnection;
-import org.droidplanner.android.communication.connection.AndroidHttpConnection.Callback;
+import org.droidplanner.android.communication.connection.SocketIOConnection;
+import org.droidplanner.android.communication.connection.SocketIOConnection.Callback;
 import org.droidplanner.android.fragments.helpers.BTDeviceListFragment;
 import org.droidplanner.android.maps.providers.google_map.GoogleMapFragment;
 import org.droidplanner.android.utils.Utils;
@@ -97,7 +97,7 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 		}
 	}
 	
-	private class CallbackImpl implements Callback {
+	public class CallbackImpl implements Callback {
 
 		private Drone drone;
 		
@@ -114,7 +114,6 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 				Log.d("debug", "Receive message to disarm. Start disarming...");
 				MavLinkArm.sendArmMessage(drone, false);
 			}
-				
 		}
 	}
 	
@@ -126,7 +125,7 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 		drone.getMavClient().queryConnectionState();
 		drone.notifyDroneEvent(DroneEventsType.MISSION_UPDATE);
 		
-		AndroidHttpConnection conn = new AndroidHttpConnection("http://140.112.21.18:8080", new CallbackImpl(drone));
+		SocketIOConnection.getInstance().setCallback(new CallbackImpl(drone));
 	}
 
 	private void maxVolumeIfEnabled() {
