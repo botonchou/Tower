@@ -15,7 +15,7 @@ public class SocketIOConnection {
 
 	// TODO
 	public interface Callback {
-        void execute(String data);
+        void execute(String[] data);
     }
 	
 	private String url;
@@ -32,7 +32,7 @@ public class SocketIOConnection {
 		this.url = url;
 		this.callback = new Callback() {
 			@Override
-			public void execute(String data) {
+			public void execute(String[] data) {
 				// do nothing.
 			}
 		};
@@ -99,17 +99,21 @@ public class SocketIOConnection {
 	    	  @Override
 	    	  public void call(Object... args) {
  		  
-	    		  if (args.length != 3)
-	    			  return;	    		  
-	    		  
-	    		  String timestamp = args[0].toString();
-	    		  String msg = args[1].toString();
-	    		  String md5 = args[2].toString();
-	    		  	    		  
-	    		  if (!md5.equals(MD5(timestamp + msg)))
+	    		  if (args.length < 3)
 	    			  return;
 	    		  
-	    		  Log.d("debug", String.format("[Message] %s {timestamp: %s, MD5: %s}", msg, timestamp, md5));
+	    		  String timestamp = args[0].toString();
+	    		  
+	    		  String[] msg = new String[args.length - 2];
+	    		  for (int i = 0; i < msg.length; ++i)
+	    			  msg[i] = args[i+1].toString();
+	    		  
+	    		  String md5 = args[args.length - 1].toString();
+	    		  
+	    		  if (!md5.equals(MD5(timestamp + join(msg, ""))))
+	    			  return;
+	    		  
+	    		  Log.d("debug", String.format("[Message] {%s} {timestamp: %s, MD5: %s}", join(msg, ", "), timestamp, md5));
 
 	    		  // TODO
 	    		  // Find a way to hold the reference of droid, either using callback or through constructor
@@ -138,6 +142,20 @@ public class SocketIOConnection {
 	        //Do anything with response..
 	        Log.d("debug", result);
 	    }
+	}
+	
+	public String join(String[] strs, String token) {
+		String str = strs[0];
+		for (int i=1; i<strs.length; ++i)
+			str += token + strs[i];
+		return str;
+	}
+	
+	public String join(Object[] obj) {
+		String str = "";
+		for (Object o : obj)
+			str += o.toString();
+		return str;
 	}
 	
 	public String MD5(String md5) {

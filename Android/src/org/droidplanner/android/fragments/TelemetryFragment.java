@@ -96,6 +96,8 @@ public class TelemetryFragment extends Fragment implements OnDroneListener {
 		roll.setText(String.format("%3.0f\u00B0", r));
 		pitch.setText(String.format("%3.0f\u00B0", p));
 		yaw.setText(String.format("%3.0f\u00B0", y));
+		
+		// TODO send y back to server
 
 	}
 

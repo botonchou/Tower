@@ -5,6 +5,7 @@ import org.droidplanner.android.DroidPlannerApp;
 import org.droidplanner.android.communication.connection.SocketIOConnection;
 import org.droidplanner.android.communication.connection.SocketIOConnection.Callback;
 import org.droidplanner.android.fragments.helpers.BTDeviceListFragment;
+import org.droidplanner.android.helpers.RcOutput;
 import org.droidplanner.android.maps.providers.google_map.GoogleMapFragment;
 import org.droidplanner.android.utils.Utils;
 import org.droidplanner.android.utils.prefs.DroidPlannerPrefs;
@@ -27,6 +28,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import org.droidplanner.core.MAVLink.MavLinkArm;
+import org.droidplanner.core.MAVLink.MavLinkRC;
+
+import com.MAVLink.Messages.ardupilotmega.msg_servo_output_raw;
 /**
  * Parent class for the app activity classes.
  */
@@ -99,6 +103,9 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 	
 	public class CallbackImpl implements Callback {
 
+		private final int ARM_DISARM = 0;
+		private final int RC_INPUTS = 1;
+		
 		private Drone drone;
 		
 		public CallbackImpl(Drone drone) {
@@ -106,14 +113,40 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 		}
 
 		@Override
-		public void execute(String data) {			
-			if (data.equals("ARM")) {
-				Log.d("debug", "Receive message to arm. Start arming...");
-				MavLinkArm.sendArmMessage(drone, true);
-			} else if (data.equals("DISARM")) {
-				Log.d("debug", "Receive message to disarm. Start disarming...");
-				MavLinkArm.sendArmMessage(drone, false);
-			}
+		public void execute(String[] data) {
+			Log.d("debug", String.format("data.length = %d", data.length));
+			
+			for (int i=0; i<data.length; ++i)
+				Log.d("debug", String.format("data[%d] = %s", i, data[i]));
+			
+			int msg_id = Integer.parseInt(data[0]);
+			
+			switch (msg_id) {
+			case ARM_DISARM:
+				
+				boolean arm = Boolean.parseBoolean(data[1]);
+				if (arm)
+					Log.d("debug", "Arming now...");
+				else
+					Log.d("debug", "Disarming now...");
+				
+				MavLinkArm.sendArmMessage(drone, arm);
+				
+				break;
+			case RC_INPUTS:
+				
+				int rcOutputs[] = new int[8];
+				
+				for (int i=0; i<8; ++i) {
+					rcOutputs[i] = Integer.parseInt(data[i+1]);
+//					Log.d("debug", String.format("rc[%d] = %d", i, rcOutputs[i]));
+				}
+				
+				MavLinkRC.sendRcOverrideMsg(drone, rcOutputs);
+				
+				break;
+			};
+
 		}
 	}
 	

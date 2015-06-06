@@ -3,6 +3,7 @@ package org.droidplanner.core.MAVLink;
 import org.droidplanner.core.model.Drone;
 
 import com.MAVLink.Messages.ardupilotmega.msg_rc_channels_override;
+import com.MAVLink.Messages.ardupilotmega.msg_rc_channels_raw;
 
 public class MavLinkRC {
 	public static void sendRcOverrideMsg(Drone drone, int[] rcOutputs) {
@@ -17,6 +18,7 @@ public class MavLinkRC {
 		msg.chan8_raw = (short) rcOutputs[7];
 		msg.target_system = 1;
 		msg.target_component = 1;
+//		msg.target_component = msg_rc_channels_raw.MAVLINK_MSG_ID_RC_CHANNELS_RAW;
 		drone.getMavClient().sendMavPacket(msg.pack());
 	}
 }
