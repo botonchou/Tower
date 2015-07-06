@@ -48,17 +48,11 @@ public class SocketIOConnection {
 	public void send_msg(final Object... msgs) {
 		String timestamp = String.format("%d", new Date().getTime());
 		
-		// args = [timestamp, msgs, md5]
-		Object[] args = new Object[msgs.length + 2];
-		args[0] = (Object) timestamp;		
+		// Note: args = [timestamp, msgs]
+		Object[] args = new Object[msgs.length + 1];
+		args[0] = (Object) timestamp;
 		System.arraycopy(msgs, 0, args, 1, msgs.length);
 		
-		String check_str = "";
-		for (int i=0; i<args.length - 1; ++i)
-			check_str += args[i].toString();
-		args[args.length - 1] = (Object) MD5(check_str);
-		
-		// TODO
 		socket.emit("message", args);
 	}
 	
@@ -98,22 +92,17 @@ public class SocketIOConnection {
 
 	    	  @Override
 	    	  public void call(Object... args) {
- 		  
-	    		  if (args.length < 3)
+	    		  // return if it's hello message
+	    		  if (args.length < 2)
 	    			  return;
 	    		  
 	    		  String timestamp = args[0].toString();
 	    		  
-	    		  String[] msg = new String[args.length - 2];
+	    		  String[] msg = new String[args.length - 1];
 	    		  for (int i = 0; i < msg.length; ++i)
-	    			  msg[i] = args[i+1].toString();
+	    			  msg[i] = args[i + 1].toString();
 	    		  
-	    		  String md5 = args[args.length - 1].toString();
-	    		  
-	    		  if (!md5.equals(MD5(timestamp + join(msg, ""))))
-	    			  return;
-	    		  
-	    		  Log.d("debug", String.format("[Message] {%s} {timestamp: %s, MD5: %s}", join(msg, ", "), timestamp, md5));
+	    		  Log.d("debug", String.format("[Message] {%s} {timestamp: %s}", join(msg, ", "), timestamp));
 
 	    		  // TODO
 	    		  // Find a way to hold the reference of droid, either using callback or through constructor
