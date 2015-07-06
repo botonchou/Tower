@@ -39,8 +39,6 @@ public abstract class SuperUI extends FragmentActivity implements OnDroneListene
 	public final static String ACTION_TOGGLE_DRONE_CONNECTION = SuperUI.class.getName()
 			+ ".ACTION_TOGGLE_DRONE_CONNECTION";
 	
-	private static final String MY_SERVER_IP = "http://140.112.21.18:8080";
-
 	private ScreenOrientation screenOrientation = new ScreenOrientation(this);
 	private InfoBarActionProvider infoBar;
 	private GCSHeartbeat gcsHeartbeat;

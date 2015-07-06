@@ -21,7 +21,7 @@ public class SocketIOConnection {
 	private String url;
 	private Socket socket;
 	private Callback callback;
-	final public static String server_ip = "http://140.112.21.18:8080";
+	final public static String server_ip = "http://192.168.1.199:8080";
 	static private SocketIOConnection socket_conn = new SocketIOConnection(server_ip);
 	
 	static public SocketIOConnection getInstance() {
